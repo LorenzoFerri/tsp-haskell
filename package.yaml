@@ -1,0 +1,22 @@
+name:                tsp-haskell
+version:             0.1.0.0
+#synopsis:
+#description:
+homepage:            https://github.com/githubuser/tsp-haskell#readme
+license:             BSD3
+author:              Lorenzo Ferri
+maintainer:          lorenzo.ferri@usi.ch
+copyright:           2018 Lorenzo Ferri
+category:            Web
+extra-source-files:
+- README.md
+
+dependencies:
+  - base >= 4.7 && < 5
+  - parsec
+  - parsec-numbers
+
+executables:
+  tsp-haskell:
+    source-dirs:      src
+    main:             Main.hs

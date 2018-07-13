@@ -1,0 +1,33 @@
+-- This file has been generated from package.yaml by hpack version 0.28.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 7b72c3c1626bff2b06296ff2d1f4b6af41b34a0505b84bd6db1f3ed32354ca3c
+
+name:           tsp-haskell
+version:        0.1.0.0
+category:       Web
+homepage:       https://github.com/githubuser/tsp-haskell#readme
+author:         Lorenzo Ferri
+maintainer:     lorenzo.ferri@usi.ch
+copyright:      2018 Lorenzo Ferri
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+cabal-version:  >= 1.10
+extra-source-files:
+    README.md
+
+executable tsp-haskell
+  main-is: Main.hs
+  other-modules:
+      Definitions
+      Parse
+      Paths_tsp_haskell
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+    , parsec
+    , parsec-numbers
+  default-language: Haskell2010
