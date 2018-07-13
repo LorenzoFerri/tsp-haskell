@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 7b72c3c1626bff2b06296ff2d1f4b6af41b34a0505b84bd6db1f3ed32354ca3c
+-- hash: 26a3d95fd3faeff6f711dce9700ef3c902535d94bc52fc4285c6b4cda4dbe994
 
 name:           tsp-haskell
 version:        0.1.0.0
@@ -30,4 +30,5 @@ executable tsp-haskell
       base >=4.7 && <5
     , parsec
     , parsec-numbers
+    , random
   default-language: Haskell2010
