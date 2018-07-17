@@ -13,14 +13,19 @@ main = do
     putStrLn "No args"
   else do
     let file = head args
-    let seed = read $ head $ tail args
-    let gen = mkStdGen seed
+    rng <- createGenerator $ tail args
     input <- readFile $ file
     case parse parseInput file input of
       Right distanceMatrix -> do
-        randomRIO (3,999)
+        putStrLn $ show $ fst $ randomR (1,10 :: Int) rng
       Left err ->
         putStrLn $ show err
 
--- createGenerator [] = mkStdGen (take 1 (randoms newStdGen))
--- createGenerator seed = 
+createGenerator :: [[Char]] -> IO StdGen
+createGenerator seedList =
+  if null seedList then do
+    getStdGen
+  else do
+    let seed = read $ head seedList
+    setStdGen (mkStdGen seed)
+    getStdGen
