@@ -16,20 +16,20 @@ main = do
   else do
     let file = head args
     rng <- createGenerator $ tail args
-    input <- readFile $ file
+    input <- readFile file
     case parse parseInput file input of
       Right distanceMatrix -> do
         let l = length distanceMatrix
         let xs = [1..l]
         ys <- shuffleM xs -- Random solution here
-        putStrLn $ show ys
-        putStrLn $ show $ getSolutionCost ys distanceMatrix
+        print ys
+        print $ getSolutionCost ys distanceMatrix
       Left err ->
-        putStrLn $ show err
+        print err
 
-createGenerator :: [[Char]] -> IO StdGen
+createGenerator :: [String] -> IO StdGen
 createGenerator seedList =
-  if null seedList then do
+  if null seedList then
     getStdGen
   else do
     let seed = read $ head seedList
@@ -37,13 +37,13 @@ createGenerator seedList =
     getStdGen
 
 isSolutionCorrect :: Tour -> Tour -> Bool
-isSolutionCorrect a b = (sort a) == (sort b)
+isSolutionCorrect a b = sort a == sort b
 
 getSolutionCost :: Tour -> DM -> Int
 getSolutionCost t dm = do
   let pairs = constructPairs t
   let costs = map (getPairCost dm) pairs
-  foldr (+) 0 costs
+  sum costs
 
 getPairCost :: DM -> (Int,Int) -> Int
 getPairCost dm (x,y) = dm !! (x-1) !! (y-1) 

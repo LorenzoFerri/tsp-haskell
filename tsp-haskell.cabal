@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 13e8cf36a163f0c96c479150da47c314afa0c4542f1a6f2a4be41da79b149d1a
+-- hash: 60a97b2789b0d66a31b884ad254e1bf96b08202b821f34528ed6bce1acc0f3fe
 
 name:           tsp-haskell
 version:        0.1.0.0
@@ -23,6 +23,7 @@ executable tsp-haskell
   other-modules:
       Definitions
       Parse
+      TwoOpt
       Paths_tsp_haskell
   hs-source-dirs:
       src
