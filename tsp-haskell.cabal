@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 26a3d95fd3faeff6f711dce9700ef3c902535d94bc52fc4285c6b4cda4dbe994
+-- hash: 13e8cf36a163f0c96c479150da47c314afa0c4542f1a6f2a4be41da79b149d1a
 
 name:           tsp-haskell
 version:        0.1.0.0
@@ -31,4 +31,5 @@ executable tsp-haskell
     , parsec
     , parsec-numbers
     , random
+    , random-shuffle
   default-language: Haskell2010

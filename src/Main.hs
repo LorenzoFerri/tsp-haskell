@@ -5,6 +5,7 @@ import System.Environment  (getArgs)
 import Text.Parsec
 import Definitions
 import System.Random
+import System.Random.Shuffle
 
 main :: IO ()
 main = do
@@ -17,7 +18,10 @@ main = do
     input <- readFile $ file
     case parse parseInput file input of
       Right distanceMatrix -> do
-        putStrLn $ show $ fst $ randomR (1,10 :: Int) rng
+        let l = length distanceMatrix
+        let xs = [1..l]
+        ys <- shuffleM xs -- Random solution here
+        putStrLn $ show $ ys
       Left err ->
         putStrLn $ show err
 
@@ -29,3 +33,4 @@ createGenerator seedList =
     let seed = read $ head seedList
     setStdGen (mkStdGen seed)
     getStdGen
+

@@ -16,6 +16,7 @@ dependencies:
   - parsec
   - parsec-numbers
   - random
+  - random-shuffle
 
 executables:
   tsp-haskell:
