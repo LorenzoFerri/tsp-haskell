@@ -7,6 +7,7 @@ import Definitions
 import System.Random
 import System.Random.Shuffle
 import Data.List
+import TwoOpt
 
 main :: IO ()
 main = do
@@ -24,6 +25,7 @@ main = do
         ys <- shuffleM xs -- Random solution here
         print ys
         print $ getSolutionCost ys distanceMatrix
+        print $ twoOptSwap ys 2 7
       Left err ->
         print err
 
