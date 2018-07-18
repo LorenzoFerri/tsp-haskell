@@ -7,6 +7,7 @@ import Definitions
 import System.Random
 import System.Random.Shuffle
 import Data.List
+import Data.Matrix
 import TwoOpt
 import Debug.Trace
 
@@ -21,11 +22,10 @@ main = do
     input <- readFile file
     case parse parseInput file input of
       Right distanceMatrix -> do
-        let l = length distanceMatrix
+        let l = length $ getRow 1 distanceMatrix
         let xs = [1..l]
         let p = generatePairs [0 .. (l - 1)]
         ys <- shuffleM xs -- Random solution here
-        print ys
         print $ getSolutionCost ys distanceMatrix
         let (new,gain) = twoOpt ys distanceMatrix 0 p
         print new
@@ -53,7 +53,7 @@ getSolutionCost t dm = do
   sum costs
 
 getPairCost :: DM -> (Int,Int) -> Int
-getPairCost dm (x,y) = dm !! (x-1) !! (y-1) 
+getPairCost dm (x,y) = dm ! (x,y) 
 
 constructPairs :: Tour -> [(Int,Int)]
 constructPairs t = do

@@ -3,6 +3,7 @@ import Definitions
 import Data.List
 import Data.Maybe
 import Debug.Trace
+import Data.Matrix
 
 twoOptSwap :: Tour -> Int -> Int -> Tour
 twoOptSwap t a b = 
@@ -20,40 +21,29 @@ swap a b list = list1 ++ [list !! b] ++ list2 ++ [list !! a] ++ list3
 
 calculateGain :: DM -> (Int,Int,Int,Int) -> Int
 calculateGain dm (a, b, c, d) = 
-    - (dm !! a !! b)
-    - (dm !! c !! d)
-    + (dm !! a !! c)
-    + (dm !! b !! d)
+    - (dm ! (a, b))
+    - (dm ! (c, d))
+    + (dm ! (a, c))
+    + (dm ! (b, d))
 
 pairs :: [a] -> [(a, a)]
 pairs l = [(x,y) | (x:ys) <- tails l, y <- ys]
-
-maybeToInt :: Maybe Int -> Int
-maybeToInt Nothing = 0
-maybeToInt (Just n) = n
 
 generatePairs :: Tour -> [(Int,Int)]
 generatePairs t = filter (\(x,y) -> y >= x+2) (pairs t)
 
 generateCityFourtuple :: Tour -> (Int,Int) -> (Int,Int,Int,Int)
 generateCityFourtuple t (i,j) = do
-    let a = (t !! i) - 1;
-    let b = (t !! (i + 1)) - 1;
-    let c = (t !! j) - 1;
-    let d = (t !! ((j + 1) `mod` length t)) - 1;
+    let a = t !! i;
+    let b = t !! (i + 1);
+    let c = t !! j;
+    let d = t !! ((j + 1) `mod` length t);
     (a,b,c,d)
-
--- Unused
-filterCityFourtuple :: DM -> (Int,Int,Int,Int) -> Bool
-filterCityFourtuple dm (a,b,c,d)= do
-    let firstCondition = (a /= c) && (d /= a)
-    let secondCondition = ((dm !! a !! b) > (dm !! b !! c)) || ((dm !! c !! d) > (dm !! c !! a))
-    firstCondition || secondCondition
 
 firstImprovement :: [(Int,Int)] -> Tour -> DM -> Int -> (Int, Int)
 firstImprovement [] _ _ _ = (-1, 0)
 firstImprovement (p:ps) t dm index = do
-    let fourTuple = trace ("gen: " ++ show index) generateCityFourtuple t p
+    let fourTuple = generateCityFourtuple t p
     let gain = calculateGain dm fourTuple
     if gain < 0 then
         (index, gain)

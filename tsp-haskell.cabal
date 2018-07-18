@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 60a97b2789b0d66a31b884ad254e1bf96b08202b821f34528ed6bce1acc0f3fe
+-- hash: 194e1821a32320e11edf092051b3cab1d00ca01679a1c6ff0782cd74c0c161db
 
 name:           tsp-haskell
 version:        0.1.0.0
@@ -29,6 +29,7 @@ executable tsp-haskell
       src
   build-depends:
       base >=4.7 && <5
+    , matrix
     , parsec
     , parsec-numbers
     , random

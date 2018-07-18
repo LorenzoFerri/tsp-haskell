@@ -17,6 +17,7 @@ dependencies:
   - parsec-numbers
   - random
   - random-shuffle
+  - matrix
 
 executables:
   tsp-haskell:
