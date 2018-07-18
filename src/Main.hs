@@ -8,6 +8,7 @@ import System.Random
 import System.Random.Shuffle
 import Data.List
 import TwoOpt
+import Debug.Trace
 
 main :: IO ()
 main = do
@@ -25,8 +26,9 @@ main = do
         ys <- shuffleM xs -- Random solution here
         print ys
         print $ getSolutionCost ys distanceMatrix
-        let new = twoOpt ys distanceMatrix
+        let (new,gain) = twoOpt ys distanceMatrix 0
         print new
+        print gain
         print $ getSolutionCost new distanceMatrix
       Left err ->
         print err

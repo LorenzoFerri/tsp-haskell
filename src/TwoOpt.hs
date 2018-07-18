@@ -2,6 +2,7 @@ module TwoOpt where
 import Definitions
 import Data.List
 import Data.Maybe
+import Debug.Trace
 
 twoOptSwap :: Tour -> Int -> Int -> Tour
 twoOptSwap t a b = 
@@ -49,18 +50,25 @@ filterCityFourtuple dm (a,b,c,d)= do
     let secondCondition = ((dm !! a !! b) > (dm !! b !! c)) || ((dm !! c !! d) > (dm !! c !! a))
     firstCondition || secondCondition
 
-twoOpt :: Tour -> DM -> Tour
-twoOpt t dm = do
-    let p = generatePairs [0..(length t - 1)]
-    let mappedPairs = map (generateCityFourtuple t) p
-    -- let filteredMappedPairs = filter (filterCityFourtuple dm) mappedPairs
-    let gainPairs = map (calculateGain dm) mappedPairs
-    let best = minimum gainPairs
-    let index = maybeToInt $ elemIndex best gainPairs
-    if best < 0 then do
-        let (i,j) = p !! index
-        let newT = twoOptSwap t (i+1) j
-        twoOpt newT dm
+{-                  Cities to swap      -> DM -> (fourtuple,Gain)  -}
+firstImprovement :: [(Int,Int,Int,Int)] -> DM -> (Maybe (Int,Int,Int,Int),Int)
+firstImprovement [] _ = (Nothing, 0)
+firstImprovement (x:xs) dm = do
+    let gain = calculateGain dm x
+    if gain < 0 then
+        (Just x,gain)
     else
-        t
-    
+        firstImprovement xs dm
+
+twoOpt :: Tour -> DM -> Int -> (Tour,Int)
+twoOpt t dm g= do
+    let p = trace "gen pairs" generatePairs [0..(length t - 1)]
+    let citiesFourtuples = trace "map" map (generateCityFourtuple t) p
+    let (tuple,gain) = trace "fi" firstImprovement citiesFourtuples dm
+    case tuple of
+        Just tp -> do
+            let index =  maybeToInt $ elemIndex tp citiesFourtuples
+            let (i,j) = p !! index
+            let newT = twoOptSwap t (i+1) j
+            twoOpt newT dm (g+gain)
+        Nothing -> (t,g)
