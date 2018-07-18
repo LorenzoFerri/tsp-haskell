@@ -25,7 +25,9 @@ main = do
         ys <- shuffleM xs -- Random solution here
         print ys
         print $ getSolutionCost ys distanceMatrix
-        print $ twoOptSwap ys 2 7
+        let new = twoOpt ys distanceMatrix
+        print new
+        print $ getSolutionCost new distanceMatrix
       Left err ->
         print err
 

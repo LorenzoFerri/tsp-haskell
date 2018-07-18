@@ -1,5 +1,7 @@
 module TwoOpt where
 import Definitions
+import Data.List
+import Data.Maybe
 
 twoOptSwap :: Tour -> Int -> Int -> Tour
 twoOptSwap t a b = 
@@ -9,8 +11,56 @@ twoOptSwap t a b =
         let newT = swap a b t
         twoOptSwap newT (a+1) (b-1)
 
-swap :: Int -> Int -> [a] -> [a]
+swap :: Int -> Int -> Tour -> Tour
 swap a b list = list1 ++ [list !! b] ++ list2 ++ [list !! a] ++ list3
     where   list1 = take a list;
             list2 = drop (succ a) (take b list);
             list3 = drop (succ b) list
+
+calculateGain :: DM -> (Int,Int,Int,Int) -> Int
+calculateGain dm (a, b, c, d) = 
+    - (dm !! a !! b)
+    - (dm !! c !! d)
+    + (dm !! a !! c)
+    + (dm !! b !! d)
+
+pairs :: [a] -> [(a, a)]
+pairs l = [(x,y) | (x:ys) <- tails l, y <- ys]
+
+maybeToInt :: Maybe Int -> Int
+maybeToInt Nothing = 0
+maybeToInt (Just n) = n
+
+generatePairs :: Tour -> [(Int,Int)]
+generatePairs t = filter (\(x,y) -> y >= x+2) (pairs t)
+
+generateCityFourtuple :: Tour -> (Int,Int) -> (Int,Int,Int,Int)
+generateCityFourtuple t (i,j) = do
+    let a = (t !! i) - 1;
+    let b = (t !! (i + 1)) - 1;
+    let c = (t !! j) - 1;
+    let d = (t !! ((j + 1) `mod` length t)) - 1;
+    (a,b,c,d)
+
+-- Unused
+filterCityFourtuple :: DM -> (Int,Int,Int,Int) -> Bool
+filterCityFourtuple dm (a,b,c,d)= do
+    let firstCondition = (a /= c) && (d /= a)
+    let secondCondition = ((dm !! a !! b) > (dm !! b !! c)) || ((dm !! c !! d) > (dm !! c !! a))
+    firstCondition || secondCondition
+
+twoOpt :: Tour -> DM -> Tour
+twoOpt t dm = do
+    let p = generatePairs [0..(length t - 1)]
+    let mappedPairs = map (generateCityFourtuple t) p
+    -- let filteredMappedPairs = filter (filterCityFourtuple dm) mappedPairs
+    let gainPairs = map (calculateGain dm) mappedPairs
+    let best = minimum gainPairs
+    let index = maybeToInt $ elemIndex best gainPairs
+    if best < 0 then do
+        let (i,j) = p !! index
+        let newT = twoOptSwap t (i+1) j
+        twoOpt newT dm
+    else
+        t
+    
