@@ -53,7 +53,7 @@ filterCityFourtuple dm (a,b,c,d)= do
 firstImprovement :: [(Int,Int)] -> Tour -> DM -> Int -> (Int, Int)
 firstImprovement [] _ _ _ = (-1, 0)
 firstImprovement (p:ps) t dm index = do
-    let fourTuple = trace ("gen: " ++ show index) generateCityFourtuple t p
+    let fourTuple = generateCityFourtuple t p
     let gain = calculateGain dm fourTuple
     if gain < 0 then
         (index, gain)
