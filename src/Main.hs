@@ -23,10 +23,11 @@ main = do
       Right distanceMatrix -> do
         let l = length distanceMatrix
         let xs = [1..l]
+        let p = generatePairs [0 .. (l - 1)]
         ys <- shuffleM xs -- Random solution here
         print ys
         print $ getSolutionCost ys distanceMatrix
-        let (new,gain) = twoOpt ys distanceMatrix 0
+        let (new,gain) = twoOpt ys distanceMatrix 0 p
         print new
         print gain
         print $ getSolutionCost new distanceMatrix

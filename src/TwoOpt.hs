@@ -50,25 +50,22 @@ filterCityFourtuple dm (a,b,c,d)= do
     let secondCondition = ((dm !! a !! b) > (dm !! b !! c)) || ((dm !! c !! d) > (dm !! c !! a))
     firstCondition || secondCondition
 
-{-                  Cities to swap      -> DM -> (fourtuple,Gain)  -}
-firstImprovement :: [(Int,Int,Int,Int)] -> DM -> (Maybe (Int,Int,Int,Int),Int)
-firstImprovement [] _ = (Nothing, 0)
-firstImprovement (x:xs) dm = do
-    let gain = calculateGain dm x
+firstImprovement :: [(Int,Int)] -> Tour -> DM -> Int -> (Int, Int)
+firstImprovement [] _ _ _ = (-1, 0)
+firstImprovement (p:ps) t dm index = do
+    let fourTuple = trace ("gen: " ++ show index) generateCityFourtuple t p
+    let gain = calculateGain dm fourTuple
     if gain < 0 then
-        (Just x,gain)
+        (index, gain)
     else
-        firstImprovement xs dm
+        firstImprovement ps t dm (index+1)
 
-twoOpt :: Tour -> DM -> Int -> (Tour,Int)
-twoOpt t dm g= do
-    let p = trace "gen pairs" generatePairs [0..(length t - 1)]
-    let citiesFourtuples = trace "map" map (generateCityFourtuple t) p
-    let (tuple,gain) = trace "fi" firstImprovement citiesFourtuples dm
-    case tuple of
-        Just tp -> do
-            let index =  maybeToInt $ elemIndex tp citiesFourtuples
-            let (i,j) = p !! index
-            let newT = twoOptSwap t (i+1) j
-            twoOpt newT dm (g+gain)
-        Nothing -> (t,g)
+twoOpt :: Tour -> DM -> Int -> [(Int,Int)] -> (Tour,Int)
+twoOpt t dm g p = do
+    let (index,gain) = firstImprovement p t dm 0
+    if gain < 0 then do
+        let (i,j) = p !! index
+        let newT = twoOptSwap t (i+1) j
+        twoOpt newT dm (g+gain) p
+    else
+        (t,g)
