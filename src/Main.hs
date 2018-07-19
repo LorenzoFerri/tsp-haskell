@@ -7,27 +7,29 @@ import Definitions
 import System.Random
 import System.Random.Shuffle
 import Data.List
-import Data.Matrix
+import Data.Matrix as Mat
 import TwoOpt
 import Debug.Trace
+import Data.Vector as Vec
 
 main :: IO ()
 main = do
   args <- getArgs
-  if null args then
+  if Data.List.null args then
     putStrLn "No args"
   else do
-    let file = head args
-    rng <- createGenerator $ tail args
+    let file = Data.List.head args
+    rng <- createGenerator $ Data.List.tail args
     input <- readFile file
     case parse parseInput file input of
       Right distanceMatrix -> do
-        let l = length $ getRow 1 distanceMatrix
+        let l = Data.List.length $ getRow 1 distanceMatrix
         let xs = [1..l]
-        let p = generatePairs [0 .. (l - 1)]
+        let p = Vec.fromList $ generatePairs [0 .. (l - 1)]
         ys <- shuffleM xs -- Random solution here
-        print $ getSolutionCost ys distanceMatrix
-        let (new,gain) = twoOpt ys distanceMatrix 0 p
+        let vecY = Vec.fromList ys
+        print $ getSolutionCost vecY distanceMatrix
+        let (new,gain) = twoOpt vecY distanceMatrix 0 p
         print new
         print gain
         print $ getSolutionCost new distanceMatrix
@@ -36,26 +38,23 @@ main = do
 
 createGenerator :: [String] -> IO StdGen
 createGenerator seedList =
-  if null seedList then
+  if Data.List.null seedList then
     getStdGen
   else do
-    let seed = read $ head seedList
+    let seed = read $ Data.List.head seedList
     setStdGen (mkStdGen seed)
     getStdGen
-
-isSolutionCorrect :: Tour -> Tour -> Bool
-isSolutionCorrect a b = sort a == sort b
 
 getSolutionCost :: Tour -> DM -> Int
 getSolutionCost t dm = do
   let pairs = constructPairs t
-  let costs = map (getPairCost dm) pairs
-  sum costs
+  let costs = Vec.map (getPairCost dm) pairs
+  Vec.sum costs
 
 getPairCost :: DM -> (Int,Int) -> Int
-getPairCost dm (x,y) = dm ! (x,y) 
+getPairCost dm (x,y) = dm Mat.! (x,y) 
 
-constructPairs :: Tour -> [(Int,Int)]
+constructPairs :: Tour -> Vector (Int,Int)
 constructPairs t = do
-  let pairs = zip t $ tail t
-  pairs ++ [(head t , last t)]
+  let pairs = Vec.zip t $ Vec.tail t
+  pairs Vec.++ Vec.fromList [(Vec.head t , Vec.last t)]
