@@ -1,8 +1,8 @@
 module TwoOpt where
 import Definitions
-import Data.List
+import Data.List as Lis
 import Data.Maybe
-import Debug.Trace
+import Debug.Trace as T
 import Data.Matrix as Mat
 import Data.Vector as Vec
 
@@ -27,12 +27,6 @@ calculateGain dm (a, b, c, d) =
     + (dm Mat.! (a, c))
     + (dm Mat.! (b, d))
 
-pairs :: [a] -> [(a, a)]
-pairs l = [(x,y) | (x:ys) <- tails l, y <- ys]
-
-generatePairs :: [Int] -> [(Int,Int)]
-generatePairs t = Data.List.filter (\(x,y) -> y >= x+2) (pairs t)
-
 generateCityFourtuple :: Tour -> (Int,Int) -> (Int,Int,Int,Int)
 generateCityFourtuple t (i,j) = do
     let a = t Vec.! i;
@@ -41,24 +35,26 @@ generateCityFourtuple t (i,j) = do
     let d = t Vec.! ((j + 1) `mod` Vec.length t);
     (a,b,c,d)
 
-firstImprovement :: Vector (Int,Int) -> Tour -> DM -> Int -> (Int, Int)
-firstImprovement p t dm index =
-    if index < Vec.length p then do
-        let fourTuple = generateCityFourtuple t (p Vec.! index)
-        let gain = calculateGain dm fourTuple
-        if gain < 0 then
-            (index, gain)
+iterateAndSwap :: Tour -> DM -> Int -> Vector (Int,Int) -> (Tour,Int)
+iterateAndSwap t dm g p = 
+    if Vec.length p > 0 then 
+        do
+            let (i,j) = Vec.head p
+            let fourTuple = generateCityFourtuple t (i,j)
+            let gain = calculateGain dm fourTuple
+            if gain < 0 then do
+                let newTour = twoOptSwap t (i+1) j
+                iterateAndSwap newTour dm (g+gain) (Vec.tail p)
+            else
+                iterateAndSwap t dm g (Vec.tail p)
         else
-            firstImprovement p t dm (index+1)
-    else
-        (-1,0)
+            (t,g)
+        
 
 twoOpt :: Tour -> DM -> Int -> Vector (Int,Int) -> (Tour,Int)
 twoOpt t dm g p = do
-    let (index,gain) = firstImprovement p t dm 0
-    if gain < 0 then do
-        let (i,j) = p Vec.! index
-        let newT = twoOptSwap t (i+1) j
+    let (newT, gain) = iterateAndSwap t dm 0 p
+    if gain < 0 then
         twoOpt newT dm (g+gain) p
     else
         (t,g)

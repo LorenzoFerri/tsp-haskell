@@ -6,7 +6,7 @@ import Text.Parsec
 import Definitions
 import System.Random
 import System.Random.Shuffle
-import Data.List
+import Data.List as Lis
 import Data.Matrix as Mat
 import TwoOpt
 import Debug.Trace
@@ -15,33 +15,32 @@ import Data.Vector as Vec
 main :: IO ()
 main = do
   args <- getArgs
-  if Data.List.null args then
+  if Lis.null args then
     putStrLn "No args"
   else do
-    let file = Data.List.head args
-    rng <- createGenerator $ Data.List.tail args
+    let file = Lis.head args
+    rng <- createGenerator $ Lis.tail args
     input <- readFile file
     case parse parseInput file input of
-      Right distanceMatrix -> do
-        let l = Data.List.length $ getRow 1 distanceMatrix
-        let xs = [1..l]
-        let p = Vec.fromList $ generatePairs [0 .. (l - 1)]
-        ys <- shuffleM xs -- Random solution here
-        let vecY = Vec.fromList ys
-        print $ getSolutionCost vecY distanceMatrix
-        let (new,gain) = twoOpt vecY distanceMatrix 0 p
-        print new
+      Right (l,distanceMatrix) -> do
+        shuffle <- shuffleM [1..l] -- Random solution here
+        let ys = Vec.fromList shuffle -- To a vector
+        let pairs =  Vec.fromList $ generatePairs [0..(l-1)]
+        let initialCost = getSolutionCost ys distanceMatrix
+        print initialCost
+        let (solution,gain) = twoOpt ys distanceMatrix 0 pairs
         print gain
-        print $ getSolutionCost new distanceMatrix
+        print $ getSolutionCost solution distanceMatrix
+
       Left err ->
         print err
 
 createGenerator :: [String] -> IO StdGen
 createGenerator seedList =
-  if Data.List.null seedList then
+  if Lis.null seedList then
     getStdGen
   else do
-    let seed = read $ Data.List.head seedList
+    let seed = read $ Lis.head seedList
     setStdGen (mkStdGen seed)
     getStdGen
 
@@ -58,3 +57,9 @@ constructPairs :: Tour -> Vector (Int,Int)
 constructPairs t = do
   let pairs = Vec.zip t $ Vec.tail t
   pairs Vec.++ Vec.fromList [(Vec.head t , Vec.last t)]
+
+pairs :: [a] -> [(a, a)]
+pairs l = [(x,y) | (x:ys) <- tails l, y <- ys]
+
+generatePairs :: [Int] -> [(Int,Int)]
+generatePairs t = Lis.filter (\(x,y) -> y >= x+2) (pairs t)

@@ -8,11 +8,11 @@ import Text.ParserCombinators.Parsec.Number
 import Data.Matrix
 import Definitions
 
-parseInput :: Parser DM
+parseInput :: Parser (Int,DM)
 parseInput = do
     manyTill anyChar (try (string "NODE_COORD_SECTION\n"))
     cityList <- many parseCity
-    return $ calculateDM cityList
+    return (length cityList, calculateDM cityList)
 
 parseCity :: Parser City
 parseCity = do
