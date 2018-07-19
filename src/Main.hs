@@ -26,12 +26,9 @@ main = do
         shuffle <- shuffleM [1..l] -- Random solution here
         let ys = Vec.fromList shuffle -- To a vector
         let pairs =  Vec.fromList $ generatePairs [0..(l-1)]
-        let initialCost = getSolutionCost ys distanceMatrix
-        print initialCost
         let (solution,gain) = twoOpt ys distanceMatrix 0 pairs
-        print gain
+        print solution
         print $ getSolutionCost solution distanceMatrix
-
       Left err ->
         print err
 
